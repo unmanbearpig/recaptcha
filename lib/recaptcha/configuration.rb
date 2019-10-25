@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'logger'
 
 module Recaptcha
   # This class enables detailed configuration of the recaptcha services.
@@ -31,7 +32,7 @@ module Recaptcha
   #
   class Configuration
     attr_accessor :skip_verify_env, :secret_key, :site_key, :api_server_url, :verify_url, :proxy,
-      :handle_timeouts_gracefully, :hostname
+      :handle_timeouts_gracefully, :hostname, :logger
 
     def initialize #:nodoc:
       @skip_verify_env            = %w[test cucumber]
@@ -39,6 +40,7 @@ module Recaptcha
 
       @secret_key           = ENV['RECAPTCHA_SECRET_KEY']
       @site_key             = ENV['RECAPTCHA_SITE_KEY']
+      @logger = ::Logger.new('/dev/null')
     end
 
     def secret_key!

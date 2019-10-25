@@ -14,12 +14,18 @@ module Recaptcha
       attribute = options[:attribute] || :base
       recaptcha_response = options[:response] || params['g-recaptcha-response'].to_s
 
+      Recaptcha.configuration.logger
+        .info("recaptcha_response = #{recaptcha_response}")
+
       begin
         verified = if recaptcha_response.empty?
           false
         else
           recaptcha_verify_via_api_call(request, recaptcha_response, options)
         end
+
+        Recaptcha.configuration.logger
+          .info("Recaptcha verified = #{verified ? 'true' : 'false'}")
 
         if verified
           flash.delete(:recaptcha_error) if recaptcha_flash_supported? && !model
@@ -35,6 +41,9 @@ module Recaptcha
           false
         end
       rescue Timeout::Error
+        Recaptcha.configuration.logger
+          .warn("Recaptcha timeout error")
+
         if Recaptcha.configuration.handle_timeouts_gracefully
           recaptcha_error(
             model,
@@ -48,6 +57,8 @@ module Recaptcha
           raise RecaptchaError, "Recaptcha unreachable."
         end
       rescue StandardError => e
+        Recaptcha.configuration.logger
+          .warn("Recaptcha error: #{e.message}\n#{e.backtrace}")
         raise RecaptchaError, e.message, e.backtrace
       end
     end

@@ -66,7 +66,7 @@ module Recaptcha
 
     response = http_instance.request(request)
 
-    Rails.logger.info("Recaptcha GET: \
+    Recaptcha.configuration.logger.info("Recaptcha GET: \
 URI: \"#{uri.request_uri}\", \
 code: #{response.code}, \
 message: #{response.message}, \
